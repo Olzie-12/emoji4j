@@ -8,6 +8,8 @@ import static ch.lambdaj.Lambda.selectFirst;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Utils to deal with emojis
