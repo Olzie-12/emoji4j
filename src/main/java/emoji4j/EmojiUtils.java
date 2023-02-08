@@ -89,7 +89,6 @@ public class EmojiUtils extends AbstractEmoji {
 	 * Common method used for processing the string to replace with emojis
 	 * 
 	 * @param text
-	 * @param regex
 	 * @return
 	 */
 	private static String processStringWithRegex(String text, Pattern pattern, int startIndex, boolean recurseEmojify) {
