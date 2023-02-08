@@ -243,4 +243,24 @@ public class EmojiUtils extends AbstractEmoji {
 		return emojiText;
 	}
 
+		/**
+	 * Counts valid emojis passed string
+	 * 
+	 * @param text String to count emoji characters in.
+	 * @return returns count of emojis
+	 */
+	public static List<String> extractEmojis(String text) {
+
+		String htmlifiedText = htmlify(text);
+		Matcher matcher = htmlEntityPattern.matcher(htmlifiedText);
+
+		List<String> emojis = new ArrayList<>();
+		while (matcher.find()) {
+			String emojiCode = matcher.group();
+			if (isEmoji(emojiCode)) {
+				emojis.add(emojiCode);
+			}
+		}
+		return emojis;
+	}
 }
