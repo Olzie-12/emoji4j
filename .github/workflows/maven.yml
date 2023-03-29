@@ -28,7 +28,7 @@ jobs:
       - name: Move Jar
         run: | 
           mkdir target/jarsemoji/
-          mv target/Emoji4J.jar target/jarsemoji/
+          mv target/emoji4j.jar target/jarsemoji/
       - name: Deploy to FTP
         uses: Olzie-12/FTP-Deploy-Action@4.3.2
         with:
