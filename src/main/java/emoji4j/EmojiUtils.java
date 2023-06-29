@@ -13,30 +13,30 @@ import java.util.ArrayList;
 
 /**
  * Utils to deal with emojis
- * 
+ *
  * @author Krishna Chaitanya Thota
  *
  */
 public class EmojiUtils extends AbstractEmoji {
 
-	
+
 	/**
 	 * Get emoji by unicode, short code, decimal html entity or hexadecimal html
 	 * entity
-	 * 
+	 *
 	 * @param code unicode, short code, decimal html entity or hexadecimal html
 	 * @return Emoji
 	 */
 	public static Emoji getEmoji(String code) {
 
 		Matcher m = shortCodePattern.matcher(code);
-		
+
 
 		// test for shortcode with colons
 		if (m.find()) {
 			code = m.group(1);
 		}
-		
+
 		Emoji emoji = selectFirst(
 				EmojiManager.data(),
 				having(on(Emoji.class).getEmoji(), Matchers.equalTo(code)).or(having(on(Emoji.class).getEmoji(), Matchers.equalTo(code)))
@@ -54,7 +54,7 @@ public class EmojiUtils extends AbstractEmoji {
 	/**
 	 * Checks if an Emoji exists for the unicode, short code, decimal or
 	 * hexadecimal html entity
-	 * 
+	 *
 	 * @param code unicode, short code, decimal html entity or hexadecimal html
 	 * @return is emoji
 	 */
@@ -64,18 +64,34 @@ public class EmojiUtils extends AbstractEmoji {
 
 	/**
 	 * Converts emoji short codes or html entities in string with emojis
-	 * 
+	 *
 	 * @param text String to emojify
 	 * @return emojified String
 	 */
 	public static String emojify(String text) {
 		return emojify(text, 0);
-		
 	}
-	
+
+
+	public String convertAlias(String text) {
+		// this should convert the unicode emoji to short code
+		// if the unicode emoji is not found, then the same text should be
+
+		// returned
+		List<String> emojis = extractEmojis(text);
+		for (String emoji : emojis) {
+			Emoji emojiObject = getEmoji(emoji);
+			if (emojiObject != null) {
+				text = text.replace(emoji, emojiObject.getAliases().get(0));
+			}
+		}
+		return text;
+	}
+
+
 	private static String emojify(String text, int startIndex) {
 		text = processStringWithRegex(text, shortCodeOrHtmlEntityPattern, startIndex, true);
-		
+
 		// emotions should be processed in second go.
 		// this will avoid conflicts with shortcodes. For Example: :p:p should
 		// not
@@ -87,7 +103,7 @@ public class EmojiUtils extends AbstractEmoji {
 
 	/**
 	 * Common method used for processing the string to replace with emojis
-	 * 
+	 *
 	 * @param text
 	 * @return
 	 */
@@ -95,18 +111,18 @@ public class EmojiUtils extends AbstractEmoji {
 		Matcher matcher = pattern.matcher(text);
 		StringBuffer sb = new StringBuffer();
 		int resetIndex = 0;
-		
+
 		if(startIndex > 0) {
 			matcher.region(startIndex, text.length());
-		} 
-		
+		}
+
 		while (matcher.find()) {
-			
+
 			String emojiCode = matcher.group();
-			
+
 			Emoji emoji = getEmoji(emojiCode);
 			// replace matched tokens with emojis
-			
+
 			if(emoji!=null) {
 				matcher.appendReplacement(sb, emoji.getEmoji());
 			} else {
@@ -116,7 +132,7 @@ public class EmojiUtils extends AbstractEmoji {
 					String lowSurrogate1 = matcher.group("L1");
 					String lowSurrogate2 = matcher.group("L2");
 					matcher.appendReplacement(sb, processStringWithRegex(highSurrogate1+highSurrogate2, shortCodeOrHtmlEntityPattern, 0, false));
-					
+
 					//basically this handles &#junk1;&#10084;&#65039;&#junk2; scenario
 					//verifies if &#junk1;&#10084; or &#junk1; are valid emojis via recursion
 					//if not move past &#junk1; and reset the cursor to &#10084;
@@ -143,7 +159,7 @@ public class EmojiUtils extends AbstractEmoji {
 
 		}
 		matcher.appendTail(sb);
-		
+
 		//do not recurse emojify when coming here through htmlSurrogateEntityPattern2..so we get a chance to check if the tail
 		//is part of a surrogate entity
 		if(recurseEmojify && resetIndex > 0) {
@@ -154,7 +170,7 @@ public class EmojiUtils extends AbstractEmoji {
 
 	/**
 	 * Counts valid emojis passed string
-	 * 
+	 *
 	 * @param text String to count emoji characters in.
 	 * @return returns count of emojis
 	 */
@@ -177,7 +193,7 @@ public class EmojiUtils extends AbstractEmoji {
 	/**
 	 * Converts unicode characters in text to corresponding decimal html
 	 * entities
-	 * 
+	 *
 	 * @param text String to htmlify
 	 * @return htmlified String
 	 */
@@ -190,11 +206,11 @@ public class EmojiUtils extends AbstractEmoji {
 		String emojifiedStr = emojify(text);
 		return htmlifyHelper(emojifiedStr, false, asSurrogate);
 	}
-	
+
 	/**
 	 * Converts unicode characters in text to corresponding hexadecimal html
 	 * entities
-	 * 
+	 *
 	 * @param text String to hexHtmlify
 	 * @return hexadecimal htmlified string
 	 */
@@ -203,11 +219,11 @@ public class EmojiUtils extends AbstractEmoji {
 		return htmlifyHelper(emojifiedStr, true, false);
 	}
 
-	
+
 
 	/**
 	 * Converts emojis, hex, decimal htmls, emoticons in a string to short codes
-	 * 
+	 *
 	 * @param text String to shortcodify
 	 * @return shortcodified string
 	 */
@@ -229,7 +245,7 @@ public class EmojiUtils extends AbstractEmoji {
 		}
 		return emojifiedText;
 	}
-	
+
 	/**
 	 * Removes all emoji characters from the passed string. This method does not remove html characters, shortcodes.
 	 * To remove all shortcodes, html characters, emojify and then pass the emojified string to this method.
@@ -237,7 +253,7 @@ public class EmojiUtils extends AbstractEmoji {
 	 * @return emoji stripped string
 	 */
 	public static String removeAllEmojis(String emojiText) {
-		
+
 		for (Emoji emoji : EmojiManager.data()) {
 			emojiText = emojiText.replace(emoji.getEmoji(), "");
 		}
@@ -246,7 +262,7 @@ public class EmojiUtils extends AbstractEmoji {
 
 		/**
 	 * Counts valid emojis passed string
-	 * 
+	 *
 	 * @param text String to count emoji characters in.
 	 * @return returns count of emojis
 	 */
