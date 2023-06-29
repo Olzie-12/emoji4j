@@ -19,7 +19,6 @@ import java.util.ArrayList;
  */
 public class EmojiUtils extends AbstractEmoji {
 
-
 	/**
 	 * Get emoji by unicode, short code, decimal html entity or hexadecimal html
 	 * entity
@@ -70,6 +69,21 @@ public class EmojiUtils extends AbstractEmoji {
 	 */
 	public static String emojify(String text) {
 		return emojify(text, 0);
+	}
+
+
+	public static String convertAlias(String text) {
+		// this should convert the unicode emoji to short code
+		// if the unicode emoji is not found, then the same text should be
+
+		// returned
+		List<String> emojis = extractEmojis(text);
+		for (String emoji : emojis) {
+			// replace the unicode with the actual shortcode
+			Emoji emojiObject = getEmoji(emoji);
+			text = text.replace(emojiObject.getEmoji(), ":" + emojiObject.getAliases().get(0) + ":");
+		}
+		return text;
 	}
 
 
