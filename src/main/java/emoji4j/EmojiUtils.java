@@ -73,7 +73,7 @@ public class EmojiUtils extends AbstractEmoji {
 	}
 
 
-	public String convertAlias(String text) {
+	public static String convertAlias(String text) {
 		// this should convert the unicode emoji to short code
 		// if the unicode emoji is not found, then the same text should be
 
