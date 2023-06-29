@@ -80,10 +80,9 @@ public class EmojiUtils extends AbstractEmoji {
 		// returned
 		List<String> emojis = extractEmojis(text);
 		for (String emoji : emojis) {
+			// replace the unicode with the actual shortcode
 			Emoji emojiObject = getEmoji(emoji);
-			if (emojiObject != null) {
-				text = text.replace(emoji, emojiObject.getAliases().get(0));
-			}
+			text = text.replace(emojiObject.getEmoji(), ":" + emojiObject.getAliases().get(0) + ":");
 		}
 		return text;
 	}
